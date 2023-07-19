@@ -1,59 +1,107 @@
-from PyQt6.QtCore import *
-from PyQt6.QtWidgets import *
-from PyQt6.QtGui import QPainter, QColor, QPen
-import pyqtgraph as pg
 import sys
 import random
+import pyqtgraph as pg
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QComboBox
 
 MAX_DATA = 100
-class Page(QWidget):
+
+
+class SortingVisualizer(QWidget):
     def __init__(self, width, height, parent=None):
         super().__init__(parent)
-        self.data = [10, 20, 30]
-        self.plot = pg.plot()
-        self.plot.getPlotItem().hideAxis('bottom')
-        self.plot.getPlotItem().hideAxis('left')
 
-        self.dataPlot = pg.BarGraphItem(x = range(len(self.data)),height = self.data, width = 0.5)
-        title = QLabel("Sorting Visualizer")
-        self.dataLabel = QLabel(' '.join(str(c) for c in self.data))
+        self.timer = QTimer()
+        self.timer.setInterval(100)  # Delay between iterations in milliseconds
+
+        self.setGeometry(500, 200, width, height)
+        self.data = random.sample(range(0, 100), 100)
+        self.iterationCount = 0
+
+        font = QFont("Arial", 16, QFont.Weight.Bold)  # Specify the font family, size, and weight
         layout = QVBoxLayout()
-        self.setGeometry(500, 500, width, height)
-        self.setWindowTitle("Sorting Visualization")
         self.setLayout(layout)
+
+        title = QLabel("Sorting Visualizer")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title.setFont(font)
         layout.addWidget(title)
-        layout.addWidget(self.dataLabel)
-        self.plot.addItem(self.dataPlot)
-        layout.addWidget(self.plot)
+
+        self.plotWidget = pg.plot()
+        self.plotWidget.setBackground('w')
+        self.plotWidget.getPlotItem().hideAxis('bottom')
+        self.plotWidget.getPlotItem().hideAxis('left')
+        self.plotWidget.setXRange(0, 100)
+        self.dataPlot = pg.BarGraphItem(x=range(len(self.data)), height=self.data, width=0.5)
+        self.plotWidget.addItem(self.dataPlot)
+        layout.addWidget(self.plotWidget)
+
         randomBtn = QPushButton("Randomize")
         randomBtn.clicked.connect(self.randomizeData)
         layout.addWidget(randomBtn)
-        addBtn = QPushButton("Add Data")
-        addBtn.clicked.connect(self.addData)
-        layout.addWidget(addBtn)
+
+        self.iterLabel = QLabel("Iteration Count: " + str(self.iterationCount))
+        layout.addWidget(self.iterLabel)
+
+        sortingLayout = QHBoxLayout()
+        layout.addLayout(sortingLayout)
+
+        sortingLabel = QLabel("Sort Algorithm:")
+        sortingLayout.addWidget(sortingLabel)
+
+        self.sortingComboBox = QComboBox()
+        self.sortingComboBox.addItems(["Bubble Sort", "Insertion Sort", "Selection Sort"])
+        sortingLayout.addWidget(self.sortingComboBox)
+
+        sortBtn = QPushButton("Sort")
+        sortBtn.clicked.connect(self.sorting)
+        layout.addWidget(sortBtn)
 
     def randomizeData(self):
         random.shuffle(self.data)
-        self.dataLabel.setText(' '.join(str(c) for c in self.data))
+        colors = [(128,0,123)]*len(self.data)
+        colors[0] = (100,22,200)
+        self.dataPlot.setOpts(brushes=colors,height=self.data)
 
-    def plotData(self):
-        pass
-    def addData(self):
-        x = random.randint(0,100)
-        self.data.append(x)
-        self.dataLabel.setText(' '.join(str(c) for c in self.data))
+    def sorting(self):
+        algorithm = self.sortingComboBox.currentText()
 
-    def resetData(self):
-        self.data = [4,2,5]
-    def sorting(self, name=None):
+        if algorithm == "Bubble Sort":
+            self.timer.timeout.connect(self.bubbleSort)
+            self.timer.start(2000)
+            #self.bubbleSort()
+        elif algorithm == "Insertion Sort":
+            self.insertionSort()
+        elif algorithm == "Selection Sort":
+            self.selectionSort()
+
+    def bubbleSort(self):
+        print("1111")
+        n = len(self.data)
+        for i in range(n - 1):
+            for j in range(n - i - 1):
+                if self.data[j] > self.data[j + 1]:
+                    self.data[j], self.data[j + 1] = self.data[j + 1], self.data[j]
+                    self.dataPlot.setOpts(height=self.data)
+                    self.updateLabel()
+        self.timer.stop()
+
+    def insertionSort(self):
+        # Implementation of insertion sort
         pass
-        # Implement your sorting algorithm here
-        # Update self.data with the changes
-        # Call self.update() after each step to trigger repaint
+
+    def selectionSort(self):
+        # Implementation of selection sort
+        pass
+
+    def updateLabel(self):
+        self.iterationCount += 1
+        self.iterLabel.setText("Iteration Count: " + str(self.iterationCount))
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = Page(600, 600)
+    window = SortingVisualizer(600, 600)
     window.show()
     sys.exit(app.exec())
