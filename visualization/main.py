@@ -14,12 +14,14 @@ minInd = 0
 class SortingVisualizer(QWidget):
     def __init__(self, width, height, parent=None):
         super().__init__(parent)
+
         self.setWindowTitle("Sorting Visualizer")
         self.timer = QTimer()
-
+        self.timer.setInterval(1000)
         self.setGeometry(500, 200, width, height)
-        self.data = random.sample(range(1, 101), 5)
+        self.data = random.sample(range(1, 101), 100)
         self.iterationCount = 0
+        self.n = len(self.data)
 
         font = QFont("Arial", 16, QFont.Weight.Bold)  # Specify the font family, size, and weight
         layout = QVBoxLayout()
@@ -61,45 +63,50 @@ class SortingVisualizer(QWidget):
         layout.addWidget(sortBtn)
 
         self.algorithm = None
+        historyLayout = QHBoxLayout()
+        layout.addLayout(historyLayout)
+
+        backBtn = QPushButton("Back")
+        historyLayout.addWidget(backBtn)
+
         nextBtn = QPushButton("Next")
         nextBtn.clicked.connect(self.stepWiseSort)
-        layout.addWidget(nextBtn)
-
+        historyLayout.addWidget(nextBtn)
     def randomizeData(self):
         random.shuffle(self.data)
         self.dataPlot.setOpts(height=self.data)
 
     def sorting(self):
+        self.timer.stop()
         self.algorithm = self.sortingComboBox.currentText()
         self.resetLabel()
+        global i, j, minInd
         if self.algorithm == "Bubble Sort":
+            i = 0
+            j = 0
             self.timer.timeout.connect(self.bubbleSort)
-            self.timer.start(40)
 
         elif self.algorithm == "Insertion Sort":
             self.timer.timeout.connect(self.insertionSort)
-            self.timer.start(40)
-
         elif self.algorithm == "Selection Sort":
-            global j
-            j = 1
+            j1 = 1
+            i1 = 0
+            minInd = 0
+            print("i : " + str(i) + " j : " + str(j))
             self.timer.timeout.connect(self.selectionSort)
-            self.timer.start(40)
+        self.timer.start(10)
 
     def bubbleSort(self):
-        n = len(self.data)
         global i, j
 
-        if i < n:
-            if j < n - i - 1:
-                colors = [(128, 128, 128)] * len(self.data)
-                colors[j] = (100, 22, 200)
-                colors[j + 1] = (100, 22, 0)
-                self.dataPlot.setOpts(brushes=colors, height=self.data)
+        if i < self.n:
+            if j < self.n - i - 1:
+                self.highlightBars(j, j + 1)
                 if self.data[j] > self.data[j + 1]:
                     self.data[j], self.data[j + 1] = self.data[j + 1], self.data[j]
-                self.updateLabel()
+                    print("BUBBLE i : " + str(i) + " j : " + str(j))
                 j += 1
+                self.updateLabel()
             else:
                 i += 1
                 j = 0
@@ -109,15 +116,13 @@ class SortingVisualizer(QWidget):
             colors = [(128, 128, 128)] * len(self.data)
             self.dataPlot.setOpts(brushes=colors, height=self.data)
             self.timer.stop()
+            self.timer.timeout.disconnect()
+
 
     def selectionSort(self):
         global i, j, minInd
-        n = len(self.data)
-        if i < n:
-            print("i : " + str(i))
-
-            if j < n:
-                print("j : " + str(j))
+        if i < self.n:
+            if j < self.n:
                 self.highlightBars(j, minInd)
                 if self.data[j] < self.data[minInd]:
                     minInd = j
@@ -125,14 +130,11 @@ class SortingVisualizer(QWidget):
                 self.updateLabel()
 
             else:
-                print("min index : " + str(minInd))
                 self.data[i], self.data[minInd] = self.data[minInd], self.data[i]
                 self.dataPlot.setOpts(height=self.data)
-
                 i += 1
-                j = i + 1
                 minInd = i
-
+                j = i + 1
 
         else:
             i = 0
@@ -141,10 +143,12 @@ class SortingVisualizer(QWidget):
             colors = [(128, 128, 128)] * len(self.data)
             self.dataPlot.setOpts(brushes=colors, height=self.data)
             self.timer.stop()
+            self.timer.timeout.disconnect()
+
+            print("SELECTION")
 
     def stepWiseSort(self):
         self.algorithm = self.sortingComboBox.currentText()
-
         if self.algorithm == "Bubble Sort":
             self.bubbleSort()
         elif self.algorithm == "Insertion Sort":
@@ -154,6 +158,9 @@ class SortingVisualizer(QWidget):
 
     def insertionSort(self):
         # Implementation of insertion sort
+        global i , j , minInd
+        print("i : " + str(i) + " j : " + str(j) + " min ind : " + str(minInd))
+
         pass
 
     def updateLabel(self):
@@ -162,7 +169,7 @@ class SortingVisualizer(QWidget):
 
     def resetLabel(self):
         self.iterationCount = 0
-        self.iterLabel.setText("Iteration Count: " + str(self.iterationCount))
+        self.iterLabel.setText("Iteration Count: 0")
 
     def highlightBars(self, ind, ind1):
         colors = [(128, 128, 128)] * len(self.data)
