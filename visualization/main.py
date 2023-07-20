@@ -82,18 +82,17 @@ class SortingVisualizer(QWidget):
         self.timer.stop()
         self.algorithm = self.sortingComboBox.currentText()
         self.resetLabel()
-        global i, j, minInd
+        global i, j, minInd, current_value
         i = 0
         j = 0
         if self.algorithm == "Bubble Sort":
             self.timer.timeout.connect(self.bubbleSort)
-
         elif self.algorithm == "Insertion Sort":
             i = 1
+            current_value = self.data[i]
             self.timer.timeout.connect(self.insertionSort)
         elif self.algorithm == "Selection Sort":
             minInd = 0
-            print("i : " + str(i) + " j : " + str(j))
             self.timer.timeout.connect(self.selectionSort)
         self.timer.start(10)
 
@@ -135,8 +134,6 @@ class SortingVisualizer(QWidget):
                 j = i + 1
 
         else:
-            i = 0
-            j = 0
             minInd = 0
             colors = [(128, 128, 128)] * len(self.data)
             self.dataPlot.setOpts(brushes=colors, height=self.data)
@@ -146,30 +143,27 @@ class SortingVisualizer(QWidget):
             print("SELECTION")
 
     def insertionSort(self):
-        # Implementation of insertion sort
         global i, j, current_value
         if i < self.n:
-            current_value = self.data[i]
+            print("i : " + str(i) + " j : " + str(j))
+
             if j >= 0 and self.data[j] > current_value:
                 self.data[j + 1] = self.data[j]
-                self.highlightBars(j + 1, j)
                 j -= 1
-
             else:
                 self.data[j + 1] = current_value
-                i += 1
-                j = i - 1
                 self.highlightBars(j + 1, i)
+                i += 1
+                if i < self.n:
+                    current_value = self.data[i]
+                    j = i - 1
+            self.dataPlot.setOpts(height=self.data)
 
         else:
             colors = [(128, 128, 128)] * len(self.data)
             self.dataPlot.setOpts(brushes=colors, height=self.data)
             self.timer.stop()
             self.timer.timeout.disconnect()
-
-        print("i : " + str(i) + " j : " + str(j))
-
-        pass
 
     def stepWiseSort(self):
         self.algorithm = self.sortingComboBox.currentText()
