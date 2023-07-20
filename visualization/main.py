@@ -42,13 +42,21 @@ class SortingVisualizer(QWidget):
         self.plotWidget.addItem(self.dataPlot)
         layout.addWidget(self.plotWidget)
 
+
+
+        # Randomize Button
         randomBtn = QPushButton("Randomize")
+        stylesheet = """QPushButton { background-color: #4CAF50; color: white; font-size: 10px; padding: 10px 20px; border-radius: 5px;}"
+            "QPushButton:hover { background-color: #45a049; }"""
+        randomBtn.setStyleSheet(stylesheet)
         randomBtn.clicked.connect(self.randomizeData)
         layout.addWidget(randomBtn)
 
+        # Iteration Count Label
         self.iterLabel = QLabel("Iteration Count: " + str(self.iterationCount))
         layout.addWidget(self.iterLabel)
 
+        # Sort Algorithm Selection
         sortingLayout = QHBoxLayout()
         layout.addLayout(sortingLayout)
 
@@ -59,15 +67,20 @@ class SortingVisualizer(QWidget):
         self.sortingComboBox.addItems(["Bubble Sort", "Insertion Sort", "Selection Sort"])
         sortingLayout.addWidget(self.sortingComboBox)
 
+        # Sort Button
         sortBtn = QPushButton("Sort")
+        sortBtn.setStyleSheet(stylesheet)
         sortBtn.clicked.connect(self.sorting)
         layout.addWidget(sortBtn)
 
         self.algorithm = None
+        self.historyStack = []
+
         historyLayout = QHBoxLayout()
         layout.addLayout(historyLayout)
 
         backBtn = QPushButton("Back")
+        backBtn.clicked.connect(self.previousSort)
         historyLayout.addWidget(backBtn)
 
         nextBtn = QPushButton("Next")
@@ -98,13 +111,11 @@ class SortingVisualizer(QWidget):
 
     def bubbleSort(self):
         global i, j
-
         if i < self.n:
             if j < self.n - i - 1:
                 self.highlightBars(j, j + 1)
                 if self.data[j] > self.data[j + 1]:
                     self.data[j], self.data[j + 1] = self.data[j + 1], self.data[j]
-                    print("BUBBLE i : " + str(i) + " j : " + str(j))
                 j += 1
                 self.updateLabel()
             else:
@@ -140,16 +151,13 @@ class SortingVisualizer(QWidget):
             self.timer.stop()
             self.timer.timeout.disconnect()
 
-            print("SELECTION")
-
     def insertionSort(self):
         global i, j, current_value
         if i < self.n:
-            print("i : " + str(i) + " j : " + str(j))
-
             if j >= 0 and self.data[j] > current_value:
                 self.data[j + 1] = self.data[j]
                 j -= 1
+                self.updateLabel()
             else:
                 self.data[j + 1] = current_value
                 self.highlightBars(j + 1, i)
@@ -173,6 +181,8 @@ class SortingVisualizer(QWidget):
             self.insertionSort()
         elif self.algorithm == "Selection Sort":
             self.selectionSort()
+    def previousSort(self):
+        pass
 
     def updateLabel(self):
         self.iterationCount += 1
