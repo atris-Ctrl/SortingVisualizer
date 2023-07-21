@@ -1,6 +1,8 @@
 # Sorting Visualizer
 
 Sorting Visual is a Python UI for visualizing simple sorting algorithms.
+## Features 
+
 
 ## Installation
 
@@ -24,6 +26,9 @@ foobar.pluralize('goose')
 # returns 'phenomenon'
 foobar.singularize('phenomena')
 ```
+
+
+## Milestones 
 
 ## Contributing
 

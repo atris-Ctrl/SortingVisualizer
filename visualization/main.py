@@ -37,12 +37,18 @@ class SortingVisualizer(QWidget):
         self.plotWidget.setBackground('w')
         self.plotWidget.getPlotItem().hideAxis('bottom')
         self.plotWidget.getPlotItem().hideAxis('left')
-        self.plotWidget.setXRange(0, 100)
+        # self.plotWidget.setXRange(0, 100)
         self.dataPlot = pg.BarGraphItem(x=range(len(self.data)), height=self.data, width=0.5)
         self.plotWidget.addItem(self.dataPlot)
         layout.addWidget(self.plotWidget)
 
+        reduceBtn = QPushButton("-")
+        layout.addWidget(reduceBtn)
+        reduceBtn.clicked.connect(self.reduceData)
 
+        addBtn = QPushButton("+")
+        layout.addWidget(addBtn)
+        addBtn.clicked.connect(self.addData)
 
         # Randomize Button
         randomBtn = QPushButton("Randomize")
@@ -67,7 +73,6 @@ class SortingVisualizer(QWidget):
         self.sortingComboBox.addItems(["Bubble Sort", "Insertion Sort", "Selection Sort"])
         sortingLayout.addWidget(self.sortingComboBox)
 
-        # Sort Button
         sortBtn = QPushButton("Sort")
         sortBtn.setStyleSheet(stylesheet)
         sortBtn.clicked.connect(self.sorting)
@@ -87,8 +92,27 @@ class SortingVisualizer(QWidget):
         nextBtn.clicked.connect(self.stepWiseSort)
         historyLayout.addWidget(nextBtn)
 
+    def updateChart(self):
+        self.plotWidget.clear()
+        self.dataPlot = pg.BarGraphItem(x=range(self.n), height=self.data, width=0.5)
+        self.plotWidget.addItem(self.dataPlot)
+
+    def reduceData(self):
+        if self.n >= 1:
+            self.data.pop()
+            self.n -= 1
+            self.updateChart()
+
+    def addData(self):
+        x = 10
+        if self.n < 100:
+            self.data.append(x)
+            self.n += 1
+            self.updateChart()
+
     def randomizeData(self):
         random.shuffle(self.data)
+        print(len(self.data))
         self.dataPlot.setOpts(height=self.data)
 
     def sorting(self):
@@ -181,6 +205,7 @@ class SortingVisualizer(QWidget):
             self.insertionSort()
         elif self.algorithm == "Selection Sort":
             self.selectionSort()
+
     def previousSort(self):
         pass
 
