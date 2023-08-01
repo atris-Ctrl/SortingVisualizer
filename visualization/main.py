@@ -1,9 +1,10 @@
 import sys
 import random
 import pyqtgraph as pg
-from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QFont, QColor
+from PyQt6.QtCore import Qt, QTimer, QSize
+from PyQt6.QtGui import QFont, QColor, QPixmap, QIcon
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QComboBox
+import ctypes
 
 MAX_DATA = 100
 i = 0
@@ -12,23 +13,39 @@ minInd = 0
 current_value = -1
 
 
+class ImageButton(QPushButton):
+    def __init__(self, image_path, parent=None):
+        super(ImageButton, self).__init__(parent)
+
+        # Load the image and set it as the background
+        image = QPixmap(image_path)
+        self.setIcon(QIcon(image))
+        self.setIconSize(QSize(image.width()+50, image.height()+50))
+        self.setFixedSize(image.width(), image.height())
+        self.setFlat(True)  # Remove button border to make it look like an image
+
+
 class SortingVisualizer(QWidget):
     def __init__(self, width, height, parent=None):
         super().__init__(parent)
 
         self.setWindowTitle("Sorting Visualizer")
+        self.setWindowIcon(QIcon('styles/logosorting.png'))
         self.timer = QTimer()
         self.timer.setInterval(1000)
         self.setGeometry(500, 200, width, height)
         self.data = random.sample(range(1, 101), MAX_DATA)
-        self.iterationCount = 0
         self.n = len(self.data)
+        self.iterationCount = 0
 
-        font = QFont("Arial", 16, QFont.Weight.Bold)  # Specify the font family, size, and weight
+        font = QFont("Arial", 14)  # Specify the font family and size
         layout = QVBoxLayout()
         self.setLayout(layout)
 
         title = QLabel("Sorting Visualizer")
+        pixmap = QPixmap("styles/sortingvisualTitle.png")
+
+        title.setPixmap(pixmap)
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title.setFont(font)
         layout.addWidget(title)
@@ -37,36 +54,34 @@ class SortingVisualizer(QWidget):
         self.plotWidget.setBackground('w')
         self.plotWidget.getPlotItem().hideAxis('bottom')
         self.plotWidget.getPlotItem().hideAxis('left')
-        # self.plotWidget.setXRange(0, 100)
-        self.dataPlot = pg.BarGraphItem(x=range(len(self.data)), height=self.data, width=0.5)
+        self.dataPlot = pg.BarGraphItem(x=range(self.n), height=self.data, width=0.5)
         self.plotWidget.addItem(self.dataPlot)
         layout.addWidget(self.plotWidget)
 
-        reduceBtn = QPushButton("-")
-        layout.addWidget(reduceBtn)
+        control_layout = QHBoxLayout()
+
+        reduceBtn = ImageButton("styles/plusButton.png")
         reduceBtn.clicked.connect(self.reduceData)
+        control_layout.addWidget(reduceBtn)
 
-        addBtn = QPushButton("+")
-        layout.addWidget(addBtn)
+        addBtn = ImageButton("styles/plusplus.png")
         addBtn.clicked.connect(self.addData)
+        control_layout.addWidget(addBtn)
 
-        # Randomize Button
         randomBtn = QPushButton("Randomize")
-        stylesheet = """QPushButton { background-color: #4CAF50; color: white; font-size: 10px; padding: 10px 20px; border-radius: 5px;}"
-            "QPushButton:hover { background-color: #45a049; }"""
-        randomBtn.setStyleSheet(stylesheet)
         randomBtn.clicked.connect(self.randomizeData)
-        layout.addWidget(randomBtn)
+        control_layout.addWidget(randomBtn)
 
-        # Iteration Count Label
+        layout.addLayout(control_layout)
+
         self.iterLabel = QLabel("Iteration Count: " + str(self.iterationCount))
         layout.addWidget(self.iterLabel)
 
-        # Sort Algorithm Selection
         sortingLayout = QHBoxLayout()
         layout.addLayout(sortingLayout)
 
         sortingLabel = QLabel("Sort Algorithm:")
+        sortingLabel.setFont(font)
         sortingLayout.addWidget(sortingLabel)
 
         self.sortingComboBox = QComboBox()
@@ -74,7 +89,6 @@ class SortingVisualizer(QWidget):
         sortingLayout.addWidget(self.sortingComboBox)
 
         sortBtn = QPushButton("Sort")
-        sortBtn.setStyleSheet(stylesheet)
         sortBtn.clicked.connect(self.sorting)
         layout.addWidget(sortBtn)
 
@@ -98,13 +112,13 @@ class SortingVisualizer(QWidget):
         self.plotWidget.addItem(self.dataPlot)
 
     def reduceData(self):
-        if self.n >= 1:
+        if self.n >= 10:
             self.data.pop()
             self.n -= 1
             self.updateChart()
 
     def addData(self):
-        x = 10
+        x = random.randint(1,MAX_DATA+1)
         if self.n < 100:
             self.data.append(x)
             self.n += 1
@@ -112,7 +126,6 @@ class SortingVisualizer(QWidget):
 
     def randomizeData(self):
         random.shuffle(self.data)
-        print(len(self.data))
         self.dataPlot.setOpts(height=self.data)
 
     def sorting(self):
@@ -142,11 +155,12 @@ class SortingVisualizer(QWidget):
                     self.data[j], self.data[j + 1] = self.data[j + 1], self.data[j]
                 j += 1
                 self.updateLabel()
+                self.historyStack.append(self.data)
             else:
                 i += 1
                 j = 0
         else:
-            colors = [(128, 128, 128)] * len(self.data)
+            colors = [(0, 0, 0)] * len(self.data)
             self.dataPlot.setOpts(brushes=colors, height=self.data)
             self.timer.stop()
             self.timer.timeout.disconnect()
@@ -170,7 +184,7 @@ class SortingVisualizer(QWidget):
 
         else:
             minInd = 0
-            colors = [(128, 128, 128)] * len(self.data)
+            colors = [(0, 0, 0)] * len(self.data)
             self.dataPlot.setOpts(brushes=colors, height=self.data)
             self.timer.stop()
             self.timer.timeout.disconnect()
@@ -192,7 +206,7 @@ class SortingVisualizer(QWidget):
             self.dataPlot.setOpts(height=self.data)
 
         else:
-            colors = [(128, 128, 128)] * len(self.data)
+            colors = [(0, 0, 0)] * len(self.data)
             self.dataPlot.setOpts(brushes=colors, height=self.data)
             self.timer.stop()
             self.timer.timeout.disconnect()
@@ -207,7 +221,11 @@ class SortingVisualizer(QWidget):
             self.selectionSort()
 
     def previousSort(self):
-        pass
+        if len(self.historyStack) > 0:
+            previousData = self.historyStack.pop()
+            self.data = previousData
+            self.n = len(previousData)
+            self.updateChart()
 
     def updateLabel(self):
         self.iterationCount += 1
@@ -218,14 +236,16 @@ class SortingVisualizer(QWidget):
         self.iterLabel.setText("Iteration Count: 0")
 
     def highlightBars(self, ind, ind1):
-        colors = [(128, 128, 128)] * len(self.data)
-        colors[ind] = (100, 22, 200)
-        colors[ind1] = (100, 22, 0)
+        colors = [(0, 0, 0)] * len(self.data)
+        colors[ind] = (102, 255, 0)
+        colors[ind1] = (255, 165, 0)
         self.dataPlot.setOpts(brushes=colors, height=self.data)
 
 
 if __name__ == '__main__':
+    myappid = 'arbitarystringtoshowtaskicon'  # arbitrary string
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     app = QApplication(sys.argv)
-    window = SortingVisualizer(600, 600)
+    window = SortingVisualizer(600, 700)
     window.show()
     sys.exit(app.exec())

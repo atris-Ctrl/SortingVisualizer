@@ -1,12 +1,12 @@
-# Sorting Visualizer
-
-Sorting Visual is a Python UI for visualizing simple sorting algorithms.
+# Sorting Visualizer <img src="visualization\styles\logosorting.png" alt="drawing" width="50"/>
+The Sorting Visualizer project helps users understand how different sorting algorithms work by providing a visual representation of their operation
 ## Features 
-
-
+- View how three simple sorting algorithms work
+    - Bubble Sort
+    - Selection Sort
+    - Insertion Sort 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
 
 ```bash
 pip install foobar
@@ -15,21 +15,20 @@ pip install foobar
 ## Usage
 
 ```python
-import foobar
 
-# returns 'words'
-foobar.pluralize('word')
-
-# returns 'geese'
-foobar.pluralize('goose')
-
-# returns 'phenomenon'
-foobar.singularize('phenomena')
 ```
+## Built With 
+- Python 
+- PyQt 6
 
-
-## Milestones 
-
+## Milestones ✨
+- [x] 3 simple sorting algorithms 
+- [x] Animation for sorting algorithm
+- [x] Increase/Decrease number of data 
+- [ ] More sorting algorithms
+- [ ] Prettier UI
+- [ ] Increase speed of animation 
+- [ ]
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first
