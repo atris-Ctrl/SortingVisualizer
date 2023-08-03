@@ -5,11 +5,13 @@ The Sorting Visualizer project helps users understand how different sorting algo
     - Bubble Sort
     - Selection Sort
     - Insertion Sort 
-## Installation
+
+![](visualization/styles/vct1CPb.gif)
+## Installation in terminal
 
 
 ```bash
-pip install foobar
+pip install -r requirements.txt
 ```
 
 ## Usage
@@ -27,8 +29,7 @@ pip install foobar
 - [x] Increase/Decrease number of data 
 - [ ] More sorting algorithms
 - [ ] Prettier UI
-- [ ] Increase speed of animation 
-- [ ]
+- [ ] Increase speed of animation
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first

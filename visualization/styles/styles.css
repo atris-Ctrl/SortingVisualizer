@@ -17,9 +17,9 @@ QPushButton{
     color: #2C3E50;
     font-size: 16px;
     border-radius: 5px;
-    height: 30px;
+    height: 20px;
+    width: 30px;
     border: 2px;
-    padding: 5px;
     transition: background-color 0.3s ease;
 }
 

@@ -142,7 +142,7 @@ class SortingVisualizer(QWidget):
         elif self.algorithm == "Selection Sort":
             minInd = 0
             self.timer.timeout.connect(self.selectionSort)
-        self.timer.start(10)
+        self.timer.start(2)
 
     def bubbleSort(self):
         global i, j
@@ -153,7 +153,6 @@ class SortingVisualizer(QWidget):
                     self.data[j], self.data[j + 1] = self.data[j + 1], self.data[j]
                 j += 1
                 self.updateLabel()
-                self.historyStack.append(self.data)
             else:
                 i += 1
                 j = 0
@@ -164,6 +163,7 @@ class SortingVisualizer(QWidget):
                 self.timer.timeout.disconnect()
             except TypeError:
                 pass
+
 
     def selectionSort(self):
         global i, j, minInd
@@ -177,12 +177,10 @@ class SortingVisualizer(QWidget):
 
             else:
                 self.data[i], self.data[minInd] = self.data[minInd], self.data[i]
-                self.resetChart()
                 i += 1
                 minInd = i
                 j = i + 1
-
-
+            self.resetChart()
 
         else:
             minInd = 0
@@ -206,7 +204,7 @@ class SortingVisualizer(QWidget):
                 if i < self.n:
                     current_value = self.data[i]
                     j = i - 1
-            self.resetChart()
+            # self.resetChart()
 
         else:
             self.resetChart()
@@ -217,6 +215,7 @@ class SortingVisualizer(QWidget):
                 pass
     def stepWiseSort(self):
         self.algorithm = self.sortingComboBox.currentText()
+        self.addHistoryQueue()
         if self.algorithm == "Bubble Sort":
             self.bubbleSort()
         elif self.algorithm == "Insertion Sort":
@@ -226,10 +225,17 @@ class SortingVisualizer(QWidget):
 
     def previousSort(self):
         if len(self.historyStack) > 0:
-            previousData = self.historyStack.pop()
+            global i, j
+            previousData = self.historyStack.pop(0)
+            print(previousData)
             self.data = previousData
-            self.n = len(previousData)
+            self.n = len(self.data)
             self.updateChart()
+    def addHistoryQueue(self):
+        if len(self.historyStack) <= 10:
+            self.historyStack.append(self.data)
+        else:
+            self.historyStack.pop()
 
     def updateLabel(self):
         self.iterationCount += 1
