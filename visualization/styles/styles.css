@@ -1,25 +1,29 @@
 
 QWidget {
-    background-color: #273c75;
+    background-color: #34495E;
 
 }
 
 
 QLabel {
-    color: #f5f6fa;
-    font-family: StayPixelRegular-EaOxl;
+    color: #ECF0F1;
+    /*font-family: ;*/
     font-size: 16px;
 }
 
 QPushButton{
-    font-family: StayPixelRegular-EaOxl;
-    background-color: #7f8fa6;
-    color: #dcdde1;
-  border-radius: 5px;
-  border: 2px;
-  transition: background-color 0.3s ease;
+    /*font-family: StayPixelRegular-EaOxl;*/
+    background-color: #95A5A6;
+    color: #2C3E50;
+    font-size: 16px;
+    border-radius: 5px;
+    height: 30px;
+    border: 2px;
+    padding: 5px;
+    transition: background-color 0.3s ease;
 }
 
 QComboBox{
     color:white;
+
 }

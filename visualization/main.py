@@ -1,19 +1,22 @@
 import sys
 import random
+
+import numpy as np
 import pyqtgraph as pg
 from PyQt6.QtCore import Qt, QTimer, QSize
 from PyQt6.QtGui import QFont, QColor, QPixmap, QIcon, QFontDatabase
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QComboBox
 import ctypes
-from visualization.ImageButton import ImageButton
+from ImageButton import ImageButton
+import sounddevice as sd
 
 MAX_DATA = 100
 i = 0
 j = 0
 minInd = 0
 current_value = -1
-
-
+def generate_sound(frequency, duration):
+    pass
 class SortingVisualizer(QWidget):
     def __init__(self, width, height, parent=None):
         super().__init__(parent)
@@ -25,7 +28,7 @@ class SortingVisualizer(QWidget):
         self.timer = QTimer()
         self.timer.setInterval(1000)
         self.setGeometry(500, 200, width, height)
-        self.data = random.sample(range(1, 101), MAX_DATA)
+        self.data = random.sample(range(1, MAX_DATA+1), MAX_DATA)
         self.n = len(self.data)
         self.iterationCount = 0
 
@@ -37,14 +40,13 @@ class SortingVisualizer(QWidget):
 
         title.setPixmap(pixmap)
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title.setFont(customFont)
         layout.addWidget(title)
 
         # Plot Widget
         self.plotWidget = pg.plot()
         self.plotWidget.getPlotItem().hideAxis('bottom')
         self.plotWidget.getPlotItem().hideAxis('left')
-        self.plotWidget.setBackground("#273c75")
+        self.plotWidget.setBackground("#34495E")
         self.dataPlot = pg.BarGraphItem(x=range(self.n), height=self.data, width=0.5)
         self.plotWidget.addItem(self.dataPlot)
         layout.addWidget(self.plotWidget)
@@ -109,9 +111,7 @@ class SortingVisualizer(QWidget):
     def reduceData(self):
         if self.n >= 10:
             self.data.pop()
-            print(len(self.data),self.n)
             self.n -= 1
-
             self.updateChart()
 
     def addData(self):
@@ -128,6 +128,7 @@ class SortingVisualizer(QWidget):
     def sorting(self):
         self.timer.stop()
         self.algorithm = self.sortingComboBox.currentText()
+        self.historyStack = []
         self.resetLabel()
         global i, j, minInd, current_value
         i = 0
@@ -180,6 +181,8 @@ class SortingVisualizer(QWidget):
                 i += 1
                 minInd = i
                 j = i + 1
+
+
 
         else:
             minInd = 0
